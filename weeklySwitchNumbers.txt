@@ -1,0 +1,131 @@
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.image import MIMEImage
+from jinja2 import Template
+from pprint import pprint
+from time import sleep
+
+def sendNpsMailToUsers(sender, toAddr, subject):
+    # due to limitations on how many emails can be sent in an hour, 
+    for user in toAddr:
+        # create you html template here.  Just place your html inbetween the """ """. Use an html online editor to get an idea of what
+        # email will look like if necessary.
+        body = Template('''
+<html>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <head>
+        <style>
+            table {
+                font-family: arial, sans-serif;
+                border-collapse: collapse;
+                width: 100%;
+            }
+
+            td, th {
+                border: 1px solid #dddddd;
+                text-align: left;
+                padding: 8px;
+            }
+
+            tr:nth-child(even) {
+                background-color: #dddddd;
+            }
+
+            tr:nth-child(odd) {
+                background-color: #e8772a;
+            }
+
+            #div-one {
+                background-color: #1f1f2e;
+                color: white;
+            }
+
+            #div-two {
+                background-color: white;
+            }
+
+            #div-three {
+                background-color: #DAD8D8;
+                text-align: center;
+                height: 20px;
+            }
+
+            img {
+                display: block;
+                margin-left: auto;
+                margin-right: auto;
+                width: 60%;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="w3-bar" id="div-one">
+            <div class="w3-bar-item">1-Click Feedback</div>
+        </div>
+        <div id="div-two">
+            <p> We noticed you have the following services running in the OSFI private cloud.</p>
+            <table>
+                <tr>
+                    <th>Service Name</th>
+                    <th>Location</th>
+                </tr>
+                {% for service in services %}
+                    <tr>
+                        <td>
+                            <p>{{service['service_name']}}</p>
+                        </td>
+                        <td>
+                            <p>{{service['location']}}</p>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+            <p>We would appreciate if you could take the following survey so that we can work to improve your OSFI service!</p>
+            <p>Thank you</p>
+        </div>
+        <div id="div-three">
+            <p>How would you rate your experience?</p>
+        </div>
+        <div id="div-two">
+            <a href="http://1click.optum.com/Survey/OpenSurvey?ID=99823d82-1b75-4a7e-b817-f8cd3399b0e7">
+                <img src="cid:image1">
+            </a>
+        </div>
+    </body>
+</html>
+        ''')
+
+        msg = MIMEMultipart()
+        msg['From'] = sender
+        msg['To'] = user['email']
+        msg['Subject'] = subject
+
+        # body.render() This is where you will feed your template any variables used inside the template.
+        #(ex. html = body.render(services=user['services']))  user['services'] is a list of dictionaries
+        html = body.render(services=user['services'])
+        # Create a MIME text object using the rendered html template
+        HTML_BODY = MIMEText(html, 'html')
+
+        
+        msg.attach(HTML_BODY)
+
+        # open file containing image.
+        fp = open('api/resources/static/images/Screen Shot 2018-05-08 at 1.57.49 PM.png', 'rb')
+        msgImage = MIMEImage(fp.read())
+        fp.close()
+
+        # define the image's ID referenced in the html template above.
+        msgImage.add_header('Content-ID', '<image1>')
+        msg.attach(msgImage)
+
+        print("%s, %s", user['name'], user['email'])
+        server = smtplib.SMTP('mailo2.uhc.com', 25)
+        text = msg.as_string()
+        try:
+            server.sendmail(sender, user['email'], text)
+        except smtplib.SMTPRecipientsRefused:
+            sleep(3660)
+            server = smtplib.SMTP('mailo2.uhc.com', 25)
+            server.sendmail(sender,user['email'],text)
+        server.quit()

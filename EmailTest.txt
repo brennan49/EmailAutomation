@@ -1,0 +1,11 @@
+import smtplib
+
+email_user = 'samrelliner@gmail.com'
+email_send = 'tdowns@clickswitch.com'
+server = smtplib.SMTP('smtp.gmail.com',587)
+server.starttls()
+server.login(email_user,'Scherbatsky')
+
+message = 'Subject: Where is your ENR!?\nDear Tracy,\n\nLet me know if you recieved this email.  It should look a little more presentable this time.\n\nSincerely, Sam Rehlinger'
+server.sendmail(email_user,email_send,message)
+server.quit()
