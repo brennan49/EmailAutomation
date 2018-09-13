@@ -1,0 +1,166 @@
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.image import MIMEImage
+from jinja2 import Template
+from pprint import pprint
+from time import sleep
+import pandas as pd
+from pprint import pprint
+
+
+def getUsers(fileName):
+    xl = pd.ExcelFile(fileName)
+    df = xl.parse()
+    df_dict = df.to_dict(orient='records')
+    return df_dict
+
+
+
+def sendMailToUsers(sender, instList, subject):
+    # due to limitations on how many emails can be sent in an hour, 
+    for institution in instList:
+
+        # create email list from instList.
+        emails = institution['Email'].split(',')
+        # create you html template here.  Just place your html inbetween the """ """. Use an html online editor to get an idea of what
+        # email will look like if necessary.
+        body = Template('''
+<html>
+ <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<style>
+		a:link, a:visited { 
+		    color:  #0d223f !important;
+		    text-decoration: none;
+		    cursor: auto;
+		}
+
+		a:link:active, a:visited:active { 
+		    color: #FF5000 !important;
+		}
+
+		a.two:link, a.two:visited { 
+		    color: #0B68C4 !important;
+		    text-decoration: underline;
+		    cursor: auto;
+        }
+        
+		a.two:link:active, a.two:visited:active { 
+		    color: #0B68C4 !important;
+        }
+        div {
+            text-align-last: left
+        }
+        .fa:hover {
+			opacity: 0.7;
+        }
+        .orangeT {
+            color: #FE5000;
+            font-family: calibri;
+            font-size: 18px;
+        }
+        .navyT {
+            color: #0d223f;
+            font-family: calibri;
+        }
+
+
+        </style>
+    </head>
+    <body>
+        <div id="div-two">
+            <p>Good Afternoon {{institution['FirstName']}}!</p>
+
+            <p>I just wanted to email you this week to check in and see how everything is going with ClickSWITCH!</p>
+
+            <p>As your ClickSWITCH Account Manager, there are many resources that I can provide, such as:</p>
+
+            <p><strong>1. Training Sessions (Admin, Branch Manager, Staff)</strong></p>
+            <p><strong>2. Marketing Materials (Free Marketing Launch Package)</strong></p>
+            <p><strong>3. Best Practices!</strong></p>
+            <p><strong>4. Much much more!</strong></p>
+            
+            <p>Let me know if you would like to hop on a quick call to see if there is anything I do to help.</p>
+
+            <p>Or.. feel free to reach out to me at 866.410.6761 x 1011. You can also reach out to our support team at support@clickswitch.com.</p>
+            
+            <p>Thank you so much!</p>
+
+</head>
+<body>
+<table>
+            <tr>
+        <span class="orangeT"><b>Sam Rehlinger</b></span></b>&nbsp;|&nbsp;<span class="navyT"><i>Account Manager</i></span>
+	</tr>
+    <tr>
+        <td style="font-family:calibri; font-size:13px; color:#797D82;"> <a href="https://www.google.com/maps/place/ClickSWITCH/@44.9825537,-93.273273,17z/data=!4m12!1m6!3m5!1s0x40544ecf622b18a5:0xf185de49ac32dd67!2sClickSWITCH!8m2!3d44.9825537!4d-93.2710843!3m4!1s0x40544ecf622b18a5:0xf185de49ac32dd67!8m2!3d44.9825537!4d-93.2710843">244 1st Avenue North, #100&nbsp;|&nbsp;Minneapolis, MN 55401<br/>tel <a href="tel:8664106761,1011">866.410.6761 x 1011</a></td>
+        </tr>
+	<tr height="35">
+        <div>
+            <td><a href="http://www.clickswitch.com/">
+                <img style="margin: 0; border: 0; padding: 0; display: block;" src="cid:image1" width="400">
+            </a></td>
+        </div>
+	</tr>
+	
+	<div>
+		<td style="font-family:calibri; width: 600px; font-size:13px; color:#797D82;"><i>CONFIDENTIALITY NOTICE: This email message and any attachments may contain confidential or proprietary information intended only for the use of the party to whom it is addressed.  If you are not an intended recipient, you are hereby notified that the reading, copying, distribution or other dissemination of the message and any attachments is strictly prohibited and may be unlawful.  If you have received this message in error, please notify the sender immediately by replying to this email.  Please delete the message and all copies of it.  Thank you.</i></td>
+	</div>
+
+</table>
+</body>
+</html>
+        ''')
+
+        msg = MIMEMultipart()
+        msg['From'] = sender
+        msg['To'] = institution['Email']
+        msg['Subject'] = subject
+
+        # body.render() This is where you will feed your template any variables used inside the template.
+        #(ex. html = body.render(services=user['services']))  user['services'] is a list of dictionaries
+        html = body.render(institution=institution)
+        # Create a MIME text object using the rendered html template
+        HTML_BODY = MIMEText(html, 'html')
+
+        
+        msg.attach(HTML_BODY)
+
+        # open file containing image.
+        fp = open('App/Resources/static/images/ClickSWITCH Logo - Color.jpg', 'rb')
+        msgImage = MIMEImage(fp.read(), _subtype="jpeg")
+        fp.close()
+
+        # define the image's ID referenced in the html template above.
+        msgImage.add_header('Content-ID', '<image1>')
+        msg.attach(msgImage)
+        
+        server = smtplib.SMTP('smtp-mail.outlook.com', 587)
+        server.ehlo()
+        server.starttls()
+        server.ehlo()
+        server.login('srehlinger@clickswitch.com','Pinocchio_++27')
+        text = msg.as_string()
+        try:
+            print("sending Email")
+            print(server.sendmail(sender, emails, text))
+        except Exception as e:
+            print("exception caught")
+            print(e)
+            sleep(120)
+            server = smtplib.SMTP('smtp-mail.outlook.com', 587)
+            server.ehlo()
+            server.starttls()
+            server.ehlo()
+            server.login('srehlinger@clickswitch.com','Pinocchio_++27')
+            print(server.sendmail(sender, emails,text))
+        server.quit()
+
+# getUsers('NewWeeklyNumbersTemplate.xlsx')
+# use python arguments, use python main, extract the html to a seperate file and have the html file name be one of the arguments
+# python unit tests
+# Defensive Programming, verify spreadsheet contents
+sendMailToUsers('srehlinger@clickswitch.com', getUsers('CheckInEmails.xlsx'), "ClickSWITCH Check-in")
