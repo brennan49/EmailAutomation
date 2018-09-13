@@ -5,10 +5,24 @@ from email.mime.image import MIMEImage
 from jinja2 import Template
 from pprint import pprint
 from time import sleep
+import pandas as pd
+from pprint import pprint
 
-def sendNpsMailToUsers(sender, toAddr, subject):
+
+def getUsers(fileName):
+    xl = pd.ExcelFile(fileName)
+    df = xl.parse()
+    df_dict = df.to_dict(orient='records')
+    return df_dict
+
+
+
+def sendMailToUsers(sender, instList, subject):
     # due to limitations on how many emails can be sent in an hour, 
-    for user in toAddr:
+    for institution in instList:
+
+        # create email list from instList.
+        emails = institution['Email'].split(',')
         # create you html template here.  Just place your html inbetween the """ """. Use an html online editor to get an idea of what
         # email will look like if necessary.
         body = Template('''
@@ -28,14 +42,6 @@ def sendNpsMailToUsers(sender, toAddr, subject):
                 padding: 8px;
             }
 
-            tr:nth-child(even) {
-                background-color: #dddddd;
-            }
-
-            tr:nth-child(odd) {
-                background-color: #e8772a;
-            }
-
             #div-one {
                 background-color: #1f1f2e;
                 color: white;
@@ -45,51 +51,68 @@ def sendNpsMailToUsers(sender, toAddr, subject):
                 background-color: white;
             }
 
-            #div-three {
-                background-color: #DAD8D8;
-                text-align: center;
-                height: 20px;
-            }
-
-            img {
-                display: block;
-                margin-left: auto;
-                margin-right: auto;
-                width: 60%;
-            }
         </style>
     </head>
     <body>
-        <div class="w3-bar" id="div-one">
-            <div class="w3-bar-item">1-Click Feedback</div>
-        </div>
         <div id="div-two">
-            <p> We noticed you have the following services running in the OSFI private cloud.</p>
+            <p> Hello!</p>
+
+            <p>Below are the switch numbers for <strong>{{institution['Institution']}}</strong>. This shows last week's numbers vs the week prior.</p>
+
             <table>
-                <tr>
-                    <th>Service Name</th>
-                    <th>Location</th>
+                <tr style="background-color: #e8772a;">
+                    <th>Week</th>
+                    <th>Enrolled</th>
+                    <th>Created</th>
+                    <th>Submitted</th>
                 </tr>
-                {% for service in services %}
-                    <tr>
+                    <tr style="background-color: #dddddd;">
                         <td>
-                            <p>{{service['service_name']}}</p>
+                            <p>{{institution['Prev.Date']}}</p>
                         </td>
                         <td>
-                            <p>{{service['location']}}</p>
+                            <p>{{institution['Prev.Enrolled']}}</p>
+                        </td>
+                        <td>
+                            <p>{{institution['Prev.Created']}}</p>
+                        </td>
+                        <td>
+                            <p>{{institution['Prev.Submitted']}}</p>
                         </td>
                     </tr>
-                {% endfor %}
+                     <tr style="background-color: #dddddd;">
+                        <td>
+                            <p>{{institution['Cur.Date']}}</p>
+                        </td>
+                        <td>
+                            <p>{{institution['Cur.Enrolled']}}</p>
+                        </td>
+                        <td>
+                            <p>{{institution['Cur.Created']}}</p>
+                        </td>
+                        <td>
+                            <p>{{institution['Cur.Submitted']}}</p>
+                        </td>
+                    </tr>
             </table>
-            <p>We would appreciate if you could take the following survey so that we can work to improve your OSFI service!</p>
-            <p>Thank you</p>
+            <p>Please feel free to contact your Account Manager for help at AM@clickswitch.com.</p>
+            <p>TIP: Keep ClickSWITCH top of mind with your staff by doing these few steps:</p>
+
+            <p><strong>1. Enroll Everyone</strong></p>
+            <p><strong>2. Give the account holder their switch track code</strong></p>
+            <p><strong>3. Go for the Direct Deposit!</strong></p>
+
+            <p>Then...</p>
+            <p>Hold your staff accountable to their progress. Feel free to forward these numbers each week to your branch managers/staff so that they will see how they are doing.</p>
+            <p>Again, feel free to reach out to Account Management or Support at support@clickswitch.com for any help or retraining you would like.</p>
+
+            <p>We are always here to help!</p>
+
+            <p>Click on our logo to view upcoming training sessions!</p>
         </div>
-        <div id="div-three">
-            <p>How would you rate your experience?</p>
-        </div>
-        <div id="div-two">
-            <a href="http://1click.optum.com/Survey/OpenSurvey?ID=99823d82-1b75-4a7e-b817-f8cd3399b0e7">
-                <img src="cid:image1">
+        <div>
+            <a href="http://www.clickswitch.com/training">
+                <img style="margin: 0; border: 0; padding: 0; display: block;" src="cid:image1" width="400">
             </a>
         </div>
     </body>
@@ -98,12 +121,12 @@ def sendNpsMailToUsers(sender, toAddr, subject):
 
         msg = MIMEMultipart()
         msg['From'] = sender
-        msg['To'] = user['email']
+        msg['To'] = institution['Email']
         msg['Subject'] = subject
 
         # body.render() This is where you will feed your template any variables used inside the template.
         #(ex. html = body.render(services=user['services']))  user['services'] is a list of dictionaries
-        html = body.render(services=user['services'])
+        html = body.render(institution=institution)
         # Create a MIME text object using the rendered html template
         HTML_BODY = MIMEText(html, 'html')
 
@@ -111,21 +134,37 @@ def sendNpsMailToUsers(sender, toAddr, subject):
         msg.attach(HTML_BODY)
 
         # open file containing image.
-        fp = open('api/resources/static/images/Screen Shot 2018-05-08 at 1.57.49 PM.png', 'rb')
-        msgImage = MIMEImage(fp.read())
+        fp = open('App/Resources/static/images/ClickSWITCH Logo - Color.jpg', 'rb')
+        msgImage = MIMEImage(fp.read(), _subtype="jpeg")
         fp.close()
 
         # define the image's ID referenced in the html template above.
         msgImage.add_header('Content-ID', '<image1>')
         msg.attach(msgImage)
-
-        print("%s, %s", user['name'], user['email'])
-        server = smtplib.SMTP('mailo2.uhc.com', 25)
+        
+        server = smtplib.SMTP('smtp-mail.outlook.com', 587)
+        server.ehlo()
+        server.starttls()
+        server.ehlo()
+        server.login('am@clickswitch.com','Jehova-18!')
         text = msg.as_string()
         try:
-            server.sendmail(sender, user['email'], text)
-        except smtplib.SMTPRecipientsRefused:
-            sleep(3660)
-            server = smtplib.SMTP('mailo2.uhc.com', 25)
-            server.sendmail(sender,user['email'],text)
+            print("sending Email")
+            print(server.sendmail(sender, emails, text))
+        except Exception as e:
+            print("exception caught")
+            print(e)
+            sleep(120)
+            server = smtplib.SMTP('smtp-mail.outlook.com', 587)
+            server.ehlo()
+            server.starttls()
+            server.ehlo()
+            server.login('am@clickswitch.com','Jehova-18!')
+            print(server.sendmail(sender, emails,text))
         server.quit()
+
+# getUsers('NewWeeklyNumbersTemplate.xlsx')
+# use python arguments, use python main, extract the html to a seperate file and have the html file name be one of the arguments
+# python unit tests
+# Defensive Programming, verify spreadsheet contents
+sendMailToUsers('am@clickswitch.com', getUsers('NewWeeklyNumbersTemplate.xlsx'), "Weekly Switch Numbers")
