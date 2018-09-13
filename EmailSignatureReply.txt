@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+                <meta name="viewport" content="width=device-width, initial-scale=1">
+                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<style>
+		a:link, a:visited { 
+		    color:  #0d223f !important;
+		    text-decoration: none;
+		    cursor: auto;
+		}
+
+		a:link:active, a:visited:active { 
+		    color: #FF5000 !important;
+		}
+
+		a.two:link, a.two:visited { 
+		    color: #0B68C4 !important;
+		    text-decoration: underline;
+		    cursor: auto;
+        }
+        
+		a.two:link:active, a.two:visited:active { 
+		    color: #0B68C4 !important;
+        }
+        div {
+            text-align-last: left
+        }
+        .fa:hover {
+			opacity: 0.7;
+        }
+        .orangeT {
+            color: #FE5000;
+            font-family: calibri;
+            font-size: 18px;
+        }
+        .navyT {
+            color: #0d223f;
+            font-family: calibri;
+        }
+	</style>
+<title>Sam Rehlinger signature</title>
+</head>
+<body>
+<table>
+<!--To hide text put it between tags like you see on this line. -->
+
+	<tr>
+        <span class="orangeT"><b>Sam Rehlinger</b></span></b>&nbsp;|&nbsp;<span class="navyT"><i>Account Manager</i></span>
+		<!-- <td style="font-family:calibri; font-size:18px; color:#FF5000;"><b>&nbsp;Sam Rehlinger</b>&nbsp;|&nbsp;<i>Account Manager</i></td> -->
+	</tr>
+	<tr>
+		<td style="font-family:calibri; font-size:13px; color:#797D82;">tel <a href="tel:8664106761,1011">866.410.6761 x 1011</a></td>
+	</tr>
+</table>
+</body>
+</html>
