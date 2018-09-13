@@ -1,0 +1,150 @@
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.image import MIMEImage
+from jinja2 import Template
+from pprint import pprint
+from time import sleep
+import pandas as pd
+from pprint import pprint
+
+
+def getUsers(fileName):
+    xl = pd.ExcelFile(fileName)
+    df = xl.parse()
+    df_dict = df.to_dict(orient='records')
+    return df_dict
+
+
+
+def sendMailToUsers(sender, instList, subject):
+    # due to limitations on how many emails can be sent in an hour, 
+    for institution in instList:
+
+        # create email list from instList.
+        emails = institution['Email'].split(',')
+        # create you html template here.  Just place your html inbetween the """ """. Use an html online editor to get an idea of what
+        # email will look like if necessary.
+        body = Template('''
+<html>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <head>
+        <style>
+            table {
+                font-family: arial, sans-serif;
+                border-collapse: collapse;
+                width: 100%;
+            }
+
+            td, th {
+                border: 1px solid #dddddd;
+                text-align: left;
+                padding: 8px;
+            }
+
+            #div-one {
+                background-color: #1f1f2e;
+                color: white;
+            }
+
+            #div-two {
+                background-color: white;
+            }
+
+        </style>
+    </head>
+    <body>
+        <div id="div-two">
+            <p> Hello!</p>
+
+            <p>See below for your quarterly switch numbers. This shows last quarter's numbers vs the quarter prior.</p>
+
+            <table>
+                <tr style="background-color: #e8772a;">
+                    <th>Quarter</th>
+                    <th>Enrolled</th>
+                    <th>Created</th>
+                    <th>Submitted</th>
+                </tr>
+                     <tr style="background-color: #dddddd;">
+                        <td>
+                            <p>{{institution['Cur.Quarter']}}</p>
+                        </td>
+                        <td>
+                            <p>{{institution['Cur.Enrolled']}}</p>
+                        </td>
+                        <td>
+                            <p>{{institution['Cur.Created']}}</p>
+                        </td>
+                        <td>
+                            <p>{{institution['Cur.Submitted']}}</p>
+                        </td>
+                    </tr>
+            </table>
+            <p>Please feel free to contact your Relationship Manager for help at AM@clickswitch.com.</p>
+            <p>We would be happy to set up a call to answer any questions you may have!</p>
+            <p>Hold your staff accountable to their progress. Feel free to forward these numbers each quarter to your branch managers/staff so that they will see how they are doing.</p>
+            <p>Again, feel free to reach out to Account Management or Support at support@clickswitch.com for any help or retraining you would like.</p>
+
+            <p>We are always here to help!</p>
+
+            <p>Click on our logo to view upcoming training sessions!</p>
+        </div>
+        <div>
+            <a href="http://www.clickswitch.com/training">
+                <img style="margin: 0; border: 0; padding: 0; display: block;" src="cid:image1" width="400">
+            </a>
+        </div>
+    </body>
+</html>
+        ''')
+
+        msg = MIMEMultipart()
+        msg['From'] = sender
+        msg['To'] = institution['Email']
+        msg['Subject'] = subject
+
+        # body.render() This is where you will feed your template any variables used inside the template.
+        #(ex. html = body.render(services=user['services']))  user['services'] is a list of dictionaries
+        html = body.render(institution=institution)
+        # Create a MIME text object using the rendered html template
+        HTML_BODY = MIMEText(html, 'html')
+
+        
+        msg.attach(HTML_BODY)
+
+        # open file containing image.
+        fp = open('App/Resources/static/images/ClickSWITCH Logo - Color.jpg', 'rb')
+        msgImage = MIMEImage(fp.read(), _subtype="jpeg")
+        fp.close()
+
+        # define the image's ID referenced in the html template above.
+        msgImage.add_header('Content-ID', '<image1>')
+        msg.attach(msgImage)
+        
+        server = smtplib.SMTP('smtp-mail.outlook.com', 587)
+        server.ehlo()
+        server.starttls()
+        server.ehlo()
+        server.login('am@clickswitch.com','9T7XZSqEpWC!%Ymg')
+        text = msg.as_string()
+        try:
+            print("sending Email")
+            print(server.sendmail(sender, emails, text))
+        except Exception as e:
+            print("exception caught")
+            print(e)
+            sleep(120)
+            server = smtplib.SMTP('smtp-mail.outlook.com', 587)
+            server.ehlo()
+            server.starttls()
+            server.ehlo()
+            server.login('am@clickswitch.com','9T7XZSqEpWC!%Ymg')
+            print(server.sendmail(sender, emails,text))
+        server.quit()
+
+# getUsers('NewQUARTERLYNumbersTemplate.xlsx')
+# use python arguments, use python main, extract the html to a seperate file and have the html file name be one of the arguments
+# python unit tests
+# Defensive Programming, verify spreadsheet contents
+sendMailToUsers('am@clickswitch.com', getUsers('NewQUARTERLYNumbersTemplate.xlsx'), "Quarterly Switch Numbers")
