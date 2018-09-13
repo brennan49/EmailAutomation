@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+                <meta name="viewport" content="width=device-width, initial-scale=1">
+                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<style>
+		a:link, a:visited { 
+		    color:  #0d223f !important;
+		    text-decoration: none;
+		    cursor: auto;
+		}
+
+		a:link:active, a:visited:active { 
+		    color: #FF5000 !important;
+		}
+
+		a.two:link, a.two:visited { 
+		    color: #0B68C4 !important;
+		    text-decoration: underline;
+		    cursor: auto;
+        }
+        
+		a.two:link:active, a.two:visited:active { 
+		    color: #0B68C4 !important;
+        }
+        div {
+            text-align-last: left
+        }
+        .fa:hover {
+			opacity: 0.7;
+        }
+        .orangeT {
+            color: #FE5000;
+            font-family: calibri;
+            font-size: 18px;
+        }
+        .navyT {
+            color: #0d223f;
+            font-family: calibri;
+        }
+	</style>
+<title>Sam Rehlinger signature</title>
+</head>
+<body>
+<table>
+<!--To hide text put it between tags like you see on this line. -->
+
+	<tr>
+        <span class="orangeT"><b>Sam Rehlinger</b></span></b>&nbsp;|&nbsp;<span class="navyT"><i>Account Manager</i></span>
+		<!-- <td style="font-family:calibri; font-size:18px; color:#FF5000;"><b>&nbsp;Sam Rehlinger</b>&nbsp;|&nbsp;<i>Account Manager</i></td> -->
+	</tr>
+    <tr>
+        <td style="font-family:calibri; font-size:13px; color:#797D82;"> <a href="https://www.google.com/maps/place/ClickSWITCH/@44.9825537,-93.273273,17z/data=!4m12!1m6!3m5!1s0x40544ecf622b18a5:0xf185de49ac32dd67!2sClickSWITCH!8m2!3d44.9825537!4d-93.2710843!3m4!1s0x40544ecf622b18a5:0xf185de49ac32dd67!8m2!3d44.9825537!4d-93.2710843">244 1st Avenue North, #100&nbsp;|&nbsp;Minneapolis, MN 55401<br/>tel <a href="tel:8664106761,1011">866.410.6761 x 1011</a></td>
+        </tr>
+	<tr height="35">
+        <div>
+            <td><a href="http://www.clickswitch.com/">
+                <img style="margin: 0; border: 0; padding: 0; display: block;" src="logo_clickswitch.svg">
+            </a></td>
+        </div>
+	</tr>
+	
+	<tr>
+		<td height="25">
+			<table>
+			<tbody>
+				<tr>
+						<td style="font-size:24px"> <a href="https://www.linkedin.com/company/clickswitch"><img src="icons8-linkedin.svg"/></a>
+						<td style="width: 10px;">&nbsp;|&nbsp;</td>	
+						<td style="font-size:24px"> <a href="https://twitter.com/click_switch"><img src="icons8-twitter.svg"/></a>
+						<td style="width: 10px;">&nbsp;|&nbsp;</td>
+						<td style="font-size:24px"> <a href="https://www.facebook.com/MyClickSwitch/"><img src="icons8-facebook.svg"/></a>
+						<td style="width: 10px;">&nbsp;|&nbsp;</td>
+						<td style="font-size:24px"> <a href="https://www.google.com/maps/place/ClickSWITCH/@44.9825537,-93.273273,17z/data=!4m12!1m6!3m5!1s0x40544ecf622b18a5:0xf185de49ac32dd67!2sClickSWITCH!8m2!3d44.9825537!4d-93.2710843!3m4!1s0x40544ecf622b18a5:0xf185de49ac32dd67!8m2!3d44.9825537!4d-93.2710843"><img src="icons8-google-maps.svg"/></a>				
+				</tr>
+			</tbody>
+			</table>
+		</td>
+	</tr>
+		<!-- <td>
+			<table>
+					<td><a href="https://minnesotabusiness.com/100-best-companies-work-2018">
+						<img style="font-size: " src="100Best18_logo_V_Reverse_web.svg" width="250" height="100">
+					</a></td>
+					<td><a href="https://www.americaninno.com/minne/twin-cities-startup/here-are-minne-innos-2018-coolest-companies-nominees/">
+						<img style="font-size: " src="Inno-Coolest Companies-Finalist.svg" width="250" height="100">
+					</a></td>	
+			</table>
+		</td> -->
+	<div>
+		<td style="font-family:calibri; width: 600px; font-size:13px; color:#797D82;"><i>CONFIDENTIALITY NOTICE: This email message and any attachments may contain confidential or proprietary information intended only for the use of the party to whom it is addressed.  If you are not an intended recipient, you are hereby notified that the reading, copying, distribution or other dissemination of the message and any attachments is strictly prohibited and may be unlawful.  If you have received this message in error, please notify the sender immediately by replying to this email.  Please delete the message and all copies of it.  Thank you.</i></td>
+	</div>
+
+</table>
+</body>
+</html>
