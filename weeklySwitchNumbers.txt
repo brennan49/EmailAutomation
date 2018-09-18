@@ -61,7 +61,7 @@ def sendMailToUsers(sender, instList, subject):
 
             <table>
                 <tr style="background-color: #e8772a;">
-                    <th>Week</th>
+                    <th>Month</th>
                     <th>Enrolled</th>
                     <th>Created</th>
                     <th>Submitted</th>
@@ -141,7 +141,7 @@ def sendMailToUsers(sender, instList, subject):
         # define the image's ID referenced in the html template above.
         msgImage.add_header('Content-ID', '<image1>')
         msg.attach(msgImage)
-        
+
         server = smtplib.SMTP('smtp-mail.outlook.com', 587)
         server.ehlo()
         server.starttls()
@@ -149,8 +149,10 @@ def sendMailToUsers(sender, instList, subject):
         server.login('am@clickswitch.com','Jehova-18!')
         text = msg.as_string()
         try:
-            print("sending Email")
-            print(server.sendmail(sender, emails, text))
+            print("Sending email to %s" % institution['Institution'])
+            server.sendmail(sender, institution['Email'], text)
+            # print("sending Email")
+            # print(server.sendmail(sender, emails, text))
         except Exception as e:
             print("exception caught")
             print(e)
@@ -163,8 +165,6 @@ def sendMailToUsers(sender, instList, subject):
             print(server.sendmail(sender, emails,text))
         server.quit()
 
-# getUsers('NewWeeklyNumbersTemplate.xlsx')
-# use python arguments, use python main, extract the html to a seperate file and have the html file name be one of the arguments
-# python unit tests
-# Defensive Programming, verify spreadsheet contents
+# getUsers('NewMONTHLYNumbersTemplate.xlsx')
+
 sendMailToUsers('am@clickswitch.com', getUsers('NewWeeklyNumbersTemplate.xlsx'), "Weekly Switch Numbers")
