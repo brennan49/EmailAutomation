@@ -1,0 +1,211 @@
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.image import MIMEImage
+from jinja2 import Template
+from pprint import pprint
+from time import sleep
+import pandas as pd
+from pprint import pprint
+
+
+def getUsers(fileName):
+    xl = pd.ExcelFile(fileName)
+    df = xl.parse()
+    df_dict = df.to_dict(orient='records')
+    return df_dict
+
+
+
+def sendMailToUsers(sender, instList, subject):
+    # due to limitations on how many emails can be sent in an hour, 
+    for institution in instList:
+
+        # create email list from instList.
+        emails = institution['Email'].split(',')
+        # create you html template here.  Just place your html inbetween the """ """. Use an html online editor to get an idea of what
+        # email will look like if necessary.
+        body = Template('''
+<html>
+ <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<style>
+
+        body {
+            width: 70%;
+        }
+
+		a:link, a:visited { 
+		    color:  #0d223f !important;
+		    text-decoration: none;
+		    cursor: auto;
+		}
+
+		a:link:active, a:visited:active { 
+		    color: #FF5000 !important;
+		}
+
+		a.two:link, a.two:visited { 
+		    color: #0B68C4 !important;
+		    text-decoration: underline;
+		    cursor: auto;
+        }
+        
+		a.two:link:active, a.two:visited:active { 
+		    color: #0B68C4 !important;
+        }
+        div {
+            text-align-last: left
+        }
+        .fa:hover {
+			opacity: 0.7;
+        }
+        .orangeT {
+            color: #FE5000;
+            font-family: calibri;
+            font-size: 18px;
+        }
+        .navyT {
+            color: #0d223f;
+            font-family: calibri;
+        }
+
+        h1 {
+            text-align: center;
+            color: #FF5000;
+        }
+
+        p {
+            text-align: center;
+        }
+
+        h2 {
+            color: #0d223f;
+            text-align: center;
+            text-decoration: underline;
+        }
+
+        h3 {
+            text-align: center;
+            color: #0d223f;
+            text-decoration: underline;
+
+        }
+
+        h4 {
+            text-align: center;
+        }
+
+        h5 {
+            text-decoration: underline;
+        }
+
+        img {
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        div {
+            text-align: center;
+        }
+
+        .no-more {
+            text-decoration: underline;
+        }
+
+
+        </style>
+    </head>
+    <body>
+        <div id="div-two">
+            <h1><strong>Where is your ENR!?!</strong></h1>
+
+            <div>WHY AREN'T YOU ELECTRONICALLY SUBMITTING SOCIAL SECURITY AND OTHER GOVERNMENT PAYMENTS THROUGH CLICKSWITCH?</div>
+        
+            <p>If you are recieving this email, then your Financial Institution does not have the FREE ENR feature enabled in your ClickSWITCH portal!</p>
+
+            <h2>What is the ENR Feature?</h2>
+            <p><strong>This is a FREE feature that allows your staff to electronically submit Social Security and other government payments from the ClickSWITCH portal!</strong></p>
+
+            <p><strong>Where it usually takes 30-60-90 days to switch, now you only need 10 business days from date of next payment.</strong></p>
+            <h5><strong>No more:</strong></h5>
+            <p>- calling Social Security and waiting on the phone</p>
+            <p>- filling out forms for your account holder</p>
+            <p>- sending them to the closest Social Security office</p>
+            
+
+            <p>With a few clicks, you can have it sent electronically to the FED and the payment transferred to your FI in only 10 business days, prior to the next secheduled payment date!</p>
+
+            <h2>Don't want to use our 3rd party Sender to the Fed, Corporate One Credit Union?</h2>
+            <p>We now can set it up where YOU can process these!</p>
+
+            <p>Once a switch is submitted through ClickSWITCH, we can send your FI a batch of Government switches to a secure site, set up in the correct format, and your team can grab them and submit them!</p>
+            <p>Please email our Account Management team at am@clickswitch.com to get this feature turned on for your Financial Institution!</p>
+
+
+            <h3>What does ENR stand for?</h3>
+            <p>ENR is a great feature allowing for the electronic submission of government related direct deposits; such as Social Security, Veteren's Benefits, and more. ENR is not an acronym, it's an abbreviation which stands for enrollment into the ACH network.</p>
+
+
+<h4>Click on our logo to view a video explaining ENR!</h4>
+        </div>
+        <div>
+            <a href="https://clickswitch.us10.list-manage.com/track/click?u=e8e7225187cb6bd6746c781e1&id=697836db7b&e=0dbb948e84">
+                <img style="margin: 0; border: 0; padding: 0; display: block;" src="cid:image1" width="400">
+            </a>
+        </div>
+</body>
+</html>
+        ''')
+
+        msg = MIMEMultipart()
+        msg['From'] = sender
+        msg['To'] = institution['Email']
+        msg['Subject'] = subject
+
+        # body.render() This is where you will feed your template any variables used inside the template.
+        #(ex. html = body.render(services=user['services']))  user['services'] is a list of dictionaries
+        html = body.render(institution=institution)
+        # Create a MIME text object using the rendered html template
+        HTML_BODY = MIMEText(html, 'html')
+
+        
+        msg.attach(HTML_BODY)
+
+        # open file containing image.
+        fp = open('App/Resources/static/images/ClickSWITCH Logo - Color.jpg', 'rb')
+        msgImage = MIMEImage(fp.read(), _subtype="jpeg")
+        fp.close()
+
+        # define the image's ID referenced in the html template above.
+        msgImage.add_header('Content-ID', '<image1>')
+        msg.attach(msgImage)
+        
+        server = smtplib.SMTP('smtp-mail.outlook.com', 587)
+        server.ehlo()
+        server.starttls()
+        server.ehlo()
+        server.login('srehlinger@clickswitch.com','Pinocchio_++27')
+        text = msg.as_string()
+        try:
+            print("sending Email")
+            print(server.sendmail(sender, emails, text))
+        except Exception as e:
+            print("exception caught")
+            print(e)
+            sleep(120)
+            server = smtplib.SMTP('smtp-mail.outlook.com', 587)
+            server.ehlo()
+            server.starttls()
+            server.ehlo()
+            server.login('srehlinger@clickswitch.com','Pinocchio_++27')
+            print(server.sendmail(sender, emails,text))
+        server.quit()
+
+# getUsers('NewWeeklyNumbersTemplate.xlsx')
+# use python arguments, use python main, extract the html to a seperate file and have the html file name be one of the arguments
+# python unit tests
+# Defensive Programming, verify spreadsheet contents
+sendMailToUsers('srehlinger@clickswitch.com', getUsers('ENREmails.xlsx'), "Where is your ENR!?")
