@@ -145,7 +145,7 @@ def sendMailToUsers(sender, instList, subject):
 
         msg = MIMEMultipart()
         msg['From'] = sender
-        msg['To'] = institution['Email']
+        msg['To'] = ", ".join(institution['Email'])
         msg['Subject'] = subject
 
         # body.render() This is where you will feed your template any variables used inside the template.
