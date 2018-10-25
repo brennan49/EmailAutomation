@@ -133,13 +133,13 @@ def sendMailToUsers(sender, instList, subject):
 
             <p>Did you know you can electronically submit Social Security and other government payments using ClickSWITCH?</p>
        
-            <p>If you are recieving this email, then your Financial Institution does not have the FREE ENR feature enabled in your ClickSWITCH portal.</p>
+            <p>If you are recieving this email, then {{institution['Institution']}} does not have the FREE ENR feature enabled in your ClickSWITCH portal.</p>
         
             <h2>What is the ENR Feature?</h2>
             <p>ENR is an abbreviation which stands for enrollment into the ACH network.</p>
-            <p>ENR is a FREE feature that allows your staff to electronically submit Social Security and other government payments from your ClickSWITCH portal in a matter of minutes. Payments are sent to the FED via our 3rd party sender, Corporate One, and transferred to your Financial Institution.</p>
+            <p>ENR is a FREE feature that allows your staff to electronically submit Social Security and other government payments from your ClickSWITCH portal in a matter of minutes. Payments are sent to the FED via our 3rd party sender, Corporate One, and transferred to {{institution['Institution']}}.</p>
 
-            <p>An ENR switch will be transferred to your FI in the same month as long as it is submitted at least 10 business days prior to the account holder’s next scheduled payment date.</p>
+            <p>An ENR switch will be transferred to {{institution['Institution']}} in the same month as long as it is submitted at least 10 business days prior to the account holder’s next scheduled payment date.</p>
             <h5><strong>Using ClickSWITCH's ENR Feature will Eliminate:</strong></h5>
             <p>- Calling Social Security and waiting on the phone</p>
             <p>- Filling out forms for your account holder</p>
@@ -149,23 +149,19 @@ def sendMailToUsers(sender, instList, subject):
             <h2>Don't want to use our 3rd party sender, Corporate One?</h2>
             <p>We can set it up where YOU can submit them yourself.</p>
 
-            <p>After a switch is submitted through ClickSWITCH, we can send your FI a batch of correctly formatted Government switches via secure site, and your team can grab and submit them.</p>
+            <p>After a switch is submitted through ClickSWITCH, we can send {{institution['Institution']}} a batch of correctly formatted Government switches via secure site, and your team can submit them.</p>
 </div>
-<table width="100%" align="center">
+<table width="100%" align="left">
     <tr>
-        <td colspan="4" style="width:100%; height:5px; background-color:#0d223f"></td>
+        <td colspan="4" style="width:100%; height:5px; background-color:#0d223f; "></td>
     </tr>
-
     <tr>   
-
         <td align="left">
                 <div style="color:#0d223f;">
-<td style="width: 20%">
+<td style="text-align: center; padding-top: 20px;padding-bottom: 20px">
 </td>
-<td width: 24%>
-               <span>Please email our Account Management team at am@clickswitch.com to get this feature turned on for your Financial Institution!</span>
-                </div>
-</td>
+        <span><strong>Please email our Account Management team at am@clickswitch.com to get this feature turned on for {{institution['Institution']}}!</strong></span>
+        </div>
         </td>    
 </tr>
 
@@ -211,8 +207,8 @@ def sendMailToUsers(sender, instList, subject):
         server.login('am@clickswitch.com','Jehova-18!')
         text = msg.as_string()
         try:
-            print("sending Email")
-            print(server.sendmail(sender, emails, text))
+            print("Sending email to %s" % institution['Institution'])
+            server.sendmail(sender, institution['Email'], text)
         except Exception as e:
             print("exception caught")
             print(e)
